@@ -62,12 +62,15 @@ exports.create = function (req, res) {
 };
 
 // Borra una canción (trackId) del registro de canciones 
-// TODO:
-// - Eliminar en tracks.cdpsfy.es el fichero de audio correspondiente a trackId
 exports.destroy = function (req, res) {
-	var trackId = req.params.trackId;
-
-	// Aquí debe implementarse el borrado del fichero de audio indetificado por trackId en tracks.cdpsfy.es
+	var trackId = req.params.trackId
+	// Borrado del fichero en tracks.cdpsfy.es
+	needle.delete('localhost:8000/users/user0/tracks/' + trackId,
+		null,
+		function(err, result) {
+			console.log("result", result.body);
+		}
+	);
 
 	// Borra la entrada del registro de datos
 	delete track_model.tracks[trackId];

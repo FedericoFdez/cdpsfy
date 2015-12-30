@@ -63,7 +63,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 
 //Elimina la canción especificada
 app.delete('/users/:userId/tracks/:trackId', function(req,res){
-	p = req.params.userId + "/" + req.params.trackId;
+	p = req.params.userId + "/" + req.params.trackId + ".mp3";
 	//p = nasPath + p;
 	console.log(p);
 	fs.unlinkSync(p);
