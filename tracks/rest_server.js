@@ -26,9 +26,8 @@ var deleteFolderRecursive = function(path) {
   		}
 	};
 
-
 app.get('/', function(req,res){
-	res.send('Bienvenido');
+	res.send('Bienvenido\n');
 })
 
 //Devuelve la canción pedida
@@ -64,7 +63,6 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 });
 
 //Elimina la canción especificada
-
 app.delete('/users/:userId/tracks/:trackId', function(req,res){
 	p = req.params.userId + "/" + req.params.trackId;
 	//p = nasPath + p;
@@ -86,8 +84,7 @@ app.post('/users/:userId', function(req,res){
 	res.send('Directorio creado');
 });
 
-//Elimina sistema de ficheros del usuario que se ha dado de baja 
-
+//Elimina sistema de ficheros del usuario que se ha dado de baja
 app.delete('/users/:userId', function(req,res){
 	p = req.params.userId;
 	// p = pathNas + p
