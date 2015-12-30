@@ -6,7 +6,7 @@ NUM_SERVIDORES = 4
 def run(machine, command):
     args = ["sudo", "lxc-attach", "-n", machine, "--"] + command
     if subprocess.call(args) != 0:
-        print "ERROR when running command: " + ''.join(args)
+        print "ERROR when running command: " + str(args)
 
 def main():
     #Arrancar el escenario
@@ -25,7 +25,7 @@ def main():
     for i in range(NUM_SERVIDORES):
         name = "s" + str(i + 1)
         run(name, ["mkdir", "/mnt/nas"])
-        run(name, ["mkdir", "mount", "-t", "glusterfs", "10.1.3.21:/nas", "/mnt/nas"])
+        run(name, ["mount", "-t", "glusterfs", "10.1.3.21:/nas", "/mnt/nas"])
 
 if __name__ == "__main__":
     main()
