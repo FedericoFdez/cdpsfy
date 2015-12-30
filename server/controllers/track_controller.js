@@ -2,7 +2,7 @@ var fs = require('fs');
 var track_model = require('./../models/track');
 var http = require('http');
 
-var querystring = require('querystring');
+var needle = require('needle')
 
 var tracksHost = "localhost"
 
@@ -33,41 +33,30 @@ exports.create = function (req, res) {
 	var name = track.originalname.split('.')[0];
 
 	// Escritura del fichero de audio en tracks.cdpsfy.es
+	var data = {
+		uploaded_track: { buffer: track.buffer, filename: track.name, content_type: 'audio/mp3' }
+	}
 
-	var post_data = querystring.stringify({
-		'foo' : 'bar'
-	});
-
-
-	var post_options = {
-		host: tracksHost,
-		port: '8000',
-		path: '/users/user0/tracks/' + id,
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': Buffer.byteLength(post_data)
+	needle.post('localhost:8000/users/user0/tracks/' + id, 
+		{ uploaded_track: { 
+			buffer: track.buffer, 
+			filename: track.name, 
+			content_type: 'audio/mp3' } },
+		{ multipart: true },
+		function(err,result) {
+			console.log("result", result.body);
 		}
-	};
-	var upload_req = http.request(post_options, function(res) {
-		res.setEncoding('utf8');
-		res.on('data', function (chunk) {
-			console.log('Response: ' + chunk);
-		});
-	});
-
-	// post the data
-	upload_req.write(post_data);
-	upload_req.end();
+	);
 
 	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
-	var url = tracksHost + ':8000/users/user0/tracks/' + id;
+	var url = 'http://' + tracksHost + ':8000/users/user0/tracks/' + id;
 
 	// Escribe los metadatos de la nueva canción en el registro.
 	track_model.tracks[id] = {
 		name: name,
 		url: url
 	};
+	console.log(track_model.tracks[id]);
 
 	res.redirect('/tracks');
 };
