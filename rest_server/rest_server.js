@@ -1,8 +1,17 @@
 var express = require('express');
 var path = require('path');
-var app = express();
+var bodyParser = require('body-parser');
 var fs = require('fs');
+
+var app = express();
+
 var nasPath = "/mnt/nas/"
+
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.listen(8000);
 
 var deleteFolderRecursive = function(path) {
     	if( fs.existsSync(path) ) {
@@ -17,7 +26,7 @@ var deleteFolderRecursive = function(path) {
     		fs.rmdirSync(path);
   		}
 	};
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.get('/', function(req,res){
 	res.send('Bienvenido');
@@ -25,7 +34,7 @@ app.get('/', function(req,res){
 
 //Devuelve la canción pedida
 app.get('/users/:userId/tracks/:trackId', function(req,res){
-	p = "/home/cdps/cdpsfy/rest_server/" + req.params.userId + "/" + req.params.trackId;
+	p = "/home/federico/Documents/cdps/cdpsfy/rest_server/" + req.params.userId + "/" + req.params.trackId;
 	//p = nasPath + p;
 	file = p + ".mp3" //Habrá que seleccionar el nombre del archivo
 	console.log(file);
@@ -36,13 +45,14 @@ app.get('/users/:userId/tracks/:trackId', function(req,res){
 
 //Inserta la canción subida
 app.post('/users/:userId/tracks/:trackId', function(req,res){
-	p = "/home/cdps/cdpsfy/rest_server/" + req.params.userId + "/" + req.params.trackId;
+	p = "/home/federico/Documents/cdps/cdpsfy/rest_server/" + req.params.userId + "/" + req.params.trackId;
 	//p = nasPath + p;
 	file = p + ".mp3" //Habrá que seleccionar el nombre del archivo
 	console.log(file);
-	fs.appendFile(file, req.files.track.buffer, function(err){
+	console.log(req);
+	/*fs.appendFile(file, req.body, function(err){
 		if (err) throw err;
-	});
+	});*/
 	res.send("Cancion insertada")
 
 });
@@ -80,4 +90,3 @@ app.delete('/users/:userId', function(req,res){
 });
 
 
-app.listen(8000);
