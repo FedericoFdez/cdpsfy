@@ -8,7 +8,7 @@ var app = express();
 var nasPath = "/mnt/nas/"
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer({ dest: './uploads/' }).single('uploaded_track'));
+app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
 
 app.listen(8000);
 
@@ -34,7 +34,7 @@ app.get('/', function(req,res){
 //Devuelve la canción pedida
 app.get('/users/:userId/tracks/:trackId', function(req,res){
 	console.log("Getting track ", req.params.trackId)
-	p = "/home/federico/Documents/cdps/cdpsfy/rest_server/" + req.params.userId + "/" + req.params.trackId;
+	p = "/home/federico/Documents/cdps/cdpsfy/tracks/" + req.params.userId + "/" + req.params.trackId;
 	//p = nasPath + p;
 	file = p + ".mp3" //Habrá que seleccionar el nombre del archivo
 	console.log(file);
@@ -48,7 +48,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 	// ubicacion temporal del archivo
 	var tmp_path = req.file.path;
 	// ubicacion destino del archivo
-	var target_path = "/home/federico/Documents/cdps/cdpsfy/rest_server/" + req.params.userId 
+	var target_path = "/home/federico/Documents/cdps/cdpsfy/tracks/" + req.params.userId 
 		+ "/" + req.file.originalname;
 	console.log(target_path)
 	// mover el archivo a la ubicación destino
