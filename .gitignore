@@ -33,3 +33,6 @@ npm-debug.log
 
 # Tracks in REST server used in development
 *.mp3
+
+# VNX files
+p7/

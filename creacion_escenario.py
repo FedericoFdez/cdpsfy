@@ -1,5 +1,10 @@
-import subprocess
+#!/usr/bin/python
+
 import time
+import subprocess
+from string import Template
+
+DEVELOPMENT = True
 
 NUM_BACKEND_SERVERS = 4
 NUM_NAS = 3
@@ -18,12 +23,18 @@ def run(machine, command):
     if subprocess.call(args) != 0:
         print "ERROR when running command: " + str(args)
 
+def download_scenario():
+    subprocess.call(["wget", "http://idefix.dit.upm.es/download/cdps/p7/p7.tgz"])
+    subprocess.call(["tar", "xfvz", "p7.tgz"])
+    subprocess.call(["ln", "-s" "../p7full.xml", "p7/p7full.xml"])
+    subprocess.call(["rm", "p7.tgz"])
+
 def load_scenario():
-    subprocess.call(["bin/prepare-p7-vm"])
-    subprocess.call(["sudo", "vnx", "-f", "p7full.xml", "-v", "--create"])
+    subprocess.call(["p7/bin/prepare-p7-vm"])
+    subprocess.call(["sudo", "vnx", "-f", "p7/p7full.xml", "-v", "--create"])
 
 def config_glusterfs():
-    #Configurar los servidores de disco (NAS)
+    # Configurar los servidores de disco (NAS)
     run("nas1", ["gluster", "peer", "probe", NAS_IP[0]])
     run("nas1", ["gluster", "peer", "probe", NAS_IP[1]])
     run("nas1", ["gluster", "peer", "probe", NAS_IP[2]])
@@ -31,77 +42,92 @@ def config_glusterfs():
     run("nas1", ["gluster", "volume", "start", "nas"])
     run("nas1", ["gluster", "volume", "info"])
 
-    #Configurar los servidores web (WWW)
+    # Configurar los servidores web (WWW)
     for i in range(NUM_BACKEND_SERVERS):
         name = "s" + str(i + 1)
         run(name, ["mkdir", "/mnt/nas"])
         run(name, ["mount", "-t", "glusterfs", NAS_IP[0] + ":/nas", "/mnt/nas"])
 
-def get_machines():
-    machines = list()
+def config_nagios_server():
+    if not DEVELOPMENT:
+        run("nagios", ["sudo", "apt-get", "install", "-y", "nagios3"])
 
-    #Servidores REST backend
+    machines = list()
+    # Servidores REST backend
     for k in range(NUM_BACKEND_SERVERS):
         ip_backend_server = NAGIOS_IP["backend_servers"] + str(k+1)
         name_backend_server = "s" + str(k+1)
         machines.append({"name": name_backend_server, "IP": ip_backend_server})
-    #Discos NAS
+    # Discos NAS
     for k in range(NUM_NAS):
         ip_nas = NAGIOS_IP["nas"] + str(k+1)
         name_nas = "nas" + str(k+1)
         machines.append({"name": name_nas, "IP": ip_nas})
-    #Balanceador
+    # Balanceador
     machines.append({"name": "lb", "IP": NAGIOS_IP["lb"] })
-    #Servidor frontend
-    machines.append({"name": "server-cdpsfy-es", "IP": NAGIOS_IP["frontend_server"] })
+    # Servidor frontend
+    machines.append({"name": "www", "IP": NAGIOS_IP["frontend_server"] })
 
-    return machines
+    machine_names = "localhost"
+    for dic in machines:
+        machine_names += "," + dic["name"]
 
-def config_nagios():
-    machines = get_machines()
+    copy_path = "/var/lib/lxc/nagios/rootfs/etc/nagios3/conf.d/"
 
-    #Creacion de los archivos machineName_nagios2.cfg
+    # Creacion de los archivos machineName_nagios2.cfg
     for dic in machines:
         ip = dic["IP"]
         name = dic["name"]
         lines = list()
-        with open('machine_nagios2.cfg', 'r') as f:
+        with open('./nagios/machine_nagios2.cfg', 'r') as f:
             for line in f.readlines():
                 a = line.replace("localhost", name)
                 b = a.replace("127.0.0.1", ip)
                 lines.append(b)
         output_name = name + "_nagios2.cfg"
-        with open(output_name, 'w') as f2:
+        with open(output_name, 'w') as f:
             for line in lines:
-                f2.write(line)
-        copy_path = "/var/lib/lxc/nagios/rootfs/etc/nagios3/conf.d/" + output_name
-        subprocess.call(["sudo","mv", output_name, copy_path])
+                f.write(line)
+        subprocess.call(["sudo", "mv", output_name, copy_path + output_name])
 
-    #Creacion del archivo hostgroups_nagios2.cfg
-    machine_names = "localhost"
-    lines2 = list()
-    for dic in machines:
-        machine_names += "," + dic["name"]
-    print machine_names
-    with open('default.cfg', 'r') as f3:
-        for line in f3.readlines():
-            a = line.replace("localhost", machine_names)
-            lines2.append(a)
-    output_name_2 = "hostgroups_nagios2.cfg"
-    with open(output_name_2, 'w') as f4:
-        for line in lines2:
-            f4.write(line)
-    copy_path2 = "/var/lib/lxc/nagios/rootfs/etc/nagios3/conf.d/" + output_name_2
-    subprocess.call(["sudo","mv",output_name_2, copy_path2 ])
-    run("nagios", ["service","apache2","start"])
-    run("nagios", ["service","nagios3","restart"])
+    # Creacion del archivo hostgroups_nagios2.cfg
+    output_name = "hostgroups_nagios2.cfg"
+    with open('./nagios/default.cfg', 'r') as f:
+        template = Template(f.read())
+        values = {
+            "DEBIAN_SERVERS": machine_names,
+            "WEB_SERVERS": "s1,s2,s3,s4,www",
+            "SSH_SERVERS": machine_names
+        }
+        with open(output_name, 'w') as output_file:
+            output_file.write(template.substitute(values))
+
+    subprocess.call(["sudo", "mv", output_name, copy_path + output_name])
+    run("nagios", ["service", "apache2", "start"])
+    run("nagios", ["service", "nagios3", "restart"])
+
+def config_frontend_server():
+    if not DEVELOPMENT:
+        run("www", ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
+        run("www", ["sudo", "apt-get", "install", "-y", "nodejs"])
+
+    subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www/rootfs/root"])
+    run("www", ["npm", "install", "/root/server/"])
+    run("www", ["node", "/root/server/bin/www"])
+
+def config_backend_servers():
+    pass
 
 def main():
+    #download_scenario()
     load_scenario()
     time.sleep(2)
 
     config_glusterfs()
-    config_nagios()
+
+    config_nagios_server()
+    config_frontend_server()
+    config_backend_servers()
 
 if __name__ == "__main__":
     main()
