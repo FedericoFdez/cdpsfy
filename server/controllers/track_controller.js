@@ -11,8 +11,6 @@ exports.list = function (req, res) {
 	track_model.Track.findAll().then(function(tracks){
 		res.render('tracks/index', {tracks: tracks})
 	})
-	//var tracks = track_model.tracks;
-	//res.render('tracks/index', {tracks: tracks});
 };
 
 // Devuelve la vista del formulario para subir una nueva canción
@@ -24,15 +22,9 @@ exports.new = function (req, res) {
 // El campo track.url contiene la url donde se encuentra el fichero de audio
 exports.show = function (req, res) {
 	track_model.Track.find({where: {'id': req.params.trackId}}).then(function(track){
-		//track.id = req.params.trackId;
-		//print(track.id)
 		res.render('tracks/show', {track: track});
 	})
 
-
-	//var track = track_model.tracks[req.params.trackId];
-	//track.id = req.params.trackId;
-	//res.render('tracks/show', {track: track});
 };
 
 // Escribe una nueva canción en el registro de canciones.
@@ -62,14 +54,11 @@ exports.create = function (req, res) {
 	var url = 'http://' + tracksHost + ':8000/users/user0/tracks/' + id;
 	*/
 	// Escribe los metadatos de la nueva canción en el registro.
-	//track_model.tracks[id] = {
-	//	name: name,
-	//	url: url
-	//};
+
 	track_model.Track.build( { id: parseInt(id), name: name, url: '/media/Dubstep.mp3'
 						}).save().then(res.redirect('/tracks'));
 
-	//console.log(track_model.tracks[id]);
+	
 
 	
 };
@@ -78,14 +67,15 @@ exports.create = function (req, res) {
 exports.destroy = function (req, res) {
 	var trackId = req.params.trackId
 	// Borrado del fichero en tracks.cdpsfy.es
+	/*
 	needle.delete('localhost:8000/users/user0/tracks/' + trackId,
 		null,
 		function(err, result) {
 			console.log("result", result.body);
 		}
 	);
-
+	*/
 	// Borra la entrada del registro de datos
-	delete track_model.tracks[trackId];
-	res.redirect('/tracks');
+	track_model.Track.destroy({where: {'id': trackId}}).then(res.redirect('/tracks'));
+	
 };
