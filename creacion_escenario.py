@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import time
 import subprocess
 from string import Template
@@ -16,12 +17,16 @@ NAGIOS_IP = {
     "backend_servers": "10.1.10.1", # .11, .12, etc.
     "nas": "10.1.10.2" # .21, .22, etc.
 }
+TRACKS_LB_IP = "10.1.2.1"
+WWW_IP = "10.1.1.1"
 
 
-def run(machine, command):
+def run(machine, command, background=False):
     args = ["sudo", "lxc-attach", "-n", machine, "--"] + command
-    if subprocess.call(args) != 0:
+    if not background and subprocess.call(args) != 0:
         print "ERROR when running command: " + str(args)
+    elif background:
+        subprocess.Popen(args)
 
 def download_scenario():
     subprocess.call(["wget", "http://idefix.dit.upm.es/download/cdps/p7/p7.tgz"])
@@ -53,7 +58,7 @@ def config_nagios_server():
         run("nagios", ["sudo", "apt-get", "install", "-y", "nagios3"])
 
     machines = list()
-    # Servidores REST backend
+    # Servidores REST backendvar/lxc/
     for k in range(NUM_BACKEND_SERVERS):
         ip_backend_server = NAGIOS_IP["backend_servers"] + str(k+1)
         name_backend_server = "s" + str(k+1)
@@ -113,10 +118,42 @@ def config_frontend_server():
 
     subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www/rootfs/root"])
     run("www", ["npm", "install", "/root/server/"])
-    run("www", ["node", "/root/server/bin/www"])
+    run("www", ["node", "/root/server/bin/www"], background=True)
+
+    subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+                    shell=True)
+    subprocess.call("sudo bash -c \"echo " + \
+        TRACKS_LB_IP + "\ttracks.cdpsfy.es >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+                    shell=True)
+    subprocess.call("sudo bash -c \"echo \# END cdpsfy >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+                    shell=True)
 
 def config_backend_servers():
-    pass
+    if not DEVELOPMENT:
+        run("www", ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
+        run("www", ["sudo", "apt-get", "install", "-y", "nodejs"])
+
+    for k in map(str, range(1, NUM_BACKEND_SERVERS+1)):
+        subprocess.call(["sudo", "cp", "-r", "tracks", "/var/lib/lxc/s" + k + "/rootfs/root"])
+        run("s" + k, ["npm", "install", "/root/tracks/"])
+        run("s" + k, ["node", "/root/tracks/rest_server.js"], background=True)
+
+def config_clients():
+    for client in ["c1", "c2"]:
+        path = "/var/lib/lxc/" + client + "/rootfs/etc/hosts"
+        subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> " + path + "\"", shell=True)
+        subprocess.call("sudo bash -c \"echo " + WWW_IP + "\twww.cdpsfy.es >> " + path + "\"",
+                        shell=True)
+        subprocess.call("sudo bash -c \"echo \# END cdpsfy >> " + path + "\"", shell=True)
+
+    # Configurar DNS del Host
+    subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /etc/hosts\"",
+                    shell=True)
+    subprocess.call("sudo bash -c \"echo " + \
+        WWW_IP + "\twww.cdpsfy.es >> /etc/hosts\"",
+                    shell=True)
+    subprocess.call("sudo bash -c \"echo \# END cdpsfy >> /etc/hosts\"",
+                    shell=True)
 
 def main():
     #download_scenario()
@@ -128,6 +165,7 @@ def main():
     config_nagios_server()
     config_frontend_server()
     config_backend_servers()
+    config_clients()
 
 if __name__ == "__main__":
     main()
