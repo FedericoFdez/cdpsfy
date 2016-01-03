@@ -3,7 +3,7 @@
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
 
-tracks:
+tracks.cdpsfy.es:
   build: tracks
   ports:
     - "8000:8000"
@@ -13,6 +13,6 @@ server:
   ports:
     - "8080:8080"
   links:
-    - tracks
+    - tracks.cdpsfy.es
   environment:
-    - TRACKS_HOST=tracks
+    - TRACKS_HOST=tracks.cdpsfy.es:8000
