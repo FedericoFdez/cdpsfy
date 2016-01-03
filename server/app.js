@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var partials = require('express-partials');
 var methodOverride = require('method-override');
+var fs = require('fs')
 
 var routes = require('./routes/index');
 
@@ -18,7 +19,10 @@ app.set('view engine', 'ejs');
 app.use(partials());
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+
+var logStream = fs.createWriteStream(__dirname + '/server-cdpsfy.log', {flags: 'a'})
+app.use(logger('dev', {stream: logStream}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

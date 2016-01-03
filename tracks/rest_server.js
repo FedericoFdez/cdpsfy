@@ -1,11 +1,15 @@
 var express = require('express');
 var path = require('path');
 var fs = require('fs');
+var logger = require('morgan');
 var multer = require('multer')
 
 var app = express();
 
 var nasPath = "/mnt/nas/"
+
+var logStream = fs.createWriteStream(__dirname + '/tracks-cdpsfy.log', {flags: 'a'})
+app.use(logger('dev', {stream: logStream}));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
