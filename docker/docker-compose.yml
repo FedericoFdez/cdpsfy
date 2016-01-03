@@ -3,14 +3,16 @@
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
 
+tracks:
+  build: tracks
+  ports:
+    - "8000:8000"
+
 server:
   build: server
   ports:
     - "8080:8080"
   links:
     - tracks
-
-tracks:
-  build: tracks
-  ports:
-    - "8000:8000"
+  environment:
+    - TRACKS_HOST=tracks

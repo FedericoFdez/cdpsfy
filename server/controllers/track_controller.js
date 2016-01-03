@@ -3,7 +3,7 @@ var track_model = require('../models/model');
 var http = require('http');
 var needle = require('needle')
 
-var tracksHost = "localhost"
+var tracksHost = process.env.TRACKS_HOST || "localhost"
 
 // Devuelve una lista de las canciones disponibles y sus metadatos
 exports.list = function (req, res) {
