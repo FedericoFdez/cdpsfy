@@ -1,0 +1,16 @@
+# Docker compose file for multi-container quiz-2015 app
+#
+# Federico A. Fernández Moreno
+# Rodrigo Barbado Esteban
+
+server:
+  build: server
+  ports:
+    - "8080:8080"
+  links:
+    - tracks
+
+tracks:
+  build: tracks
+  ports:
+    - "8000:8000"

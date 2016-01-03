@@ -20,8 +20,9 @@ app.use(partials());
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-var logStream = fs.createWriteStream(__dirname + '/server-cdpsfy.log', {flags: 'a'})
-app.use(logger('dev', {stream: logStream}));
+//var logStream = fs.createWriteStream(__dirname + '/server-cdpsfy.log', {flags: 'a'})
+//app.use(logger('dev', {stream: logStream}));
+app.use(logger('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
