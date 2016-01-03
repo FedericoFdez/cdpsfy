@@ -36,3 +36,6 @@ npm-debug.log
 
 # VNX files
 p7/
+
+# Database
+server/cdpsfy.sqlite
