@@ -14,7 +14,8 @@ var nasPath = "/mnt/nas/"
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
 
-app.listen(8000);
+var port = parseInt(process.env.PORT || '8000', 10);
+app.listen(port);
 
 var deleteFolderRecursive = function(path) {
     	if( fs.existsSync(path) ) {
