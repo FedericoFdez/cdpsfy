@@ -1,5 +1,5 @@
 # Dockerfile to create a container running tracks-cdpsfy
-# MULTI CONTAINER APP: This container must be used with a postgres container
+# MULTI CONTAINER APP
 #
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
@@ -23,6 +23,7 @@ RUN git clone git@github.com:FedericoFdez/cdpsfy.git
 WORKDIR cdpsfy/tracks
 RUN npm install
 
-EXPOSE 8000
+EXPOSE 3000
+EXPOSE 7
 
 CMD npm start

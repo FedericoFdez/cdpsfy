@@ -1,18 +1,51 @@
-# Docker compose file for multi-container quiz-2015 app
+# Docker compose file for multi-container cdpsfy app
 #
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
 
-tracks.cdpsfy.es:
+s1:
   build: tracks
-  ports:
-    - "8000:8000"
 
-server:
+s2:
+  build: tracks
+
+s3:
+  build: tracks
+
+s4:
+  build: tracks
+
+tracks.cdpsfy.es:
+  build: lb
+  ports:
+    - "8000:3000"
+    - "8001:8001"
+  links:
+    - s1
+    - s2
+    - s3
+    - s4
+  environment:
+    - PORT=3000
+
+www:
   build: server
   ports:
-    - "8080:8080"
+    - "80:3000"
   links:
     - tracks.cdpsfy.es
   environment:
-    - TRACKS_HOST=tracks.cdpsfy.es:8000
+    - TRACKS_HOST=tracks.cdpsfy.es
+    - PORT=3000
+
+nagios:
+  build: nagios
+  ports:
+    - "8003:80"
+  links:
+    - s1
+    - s2
+    - s3
+    - s4
+    - tracks.cdpsfy.es
+    - www
