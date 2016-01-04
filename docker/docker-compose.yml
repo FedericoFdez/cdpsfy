@@ -5,15 +5,23 @@
 
 s1:
   build: tracks
+  environment:
+    - PORT=3000
 
 s2:
   build: tracks
+  environment:
+    - PORT=3000
 
 s3:
   build: tracks
+  environment:
+    - PORT=3000
 
 s4:
   build: tracks
+  environment:
+    - PORT=3000
 
 tracks.cdpsfy.es:
   build: lb
@@ -25,8 +33,6 @@ tracks.cdpsfy.es:
     - s2
     - s3
     - s4
-  environment:
-    - PORT=3000
 
 www:
   build: server

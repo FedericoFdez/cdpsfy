@@ -8,13 +8,10 @@ FROM federicofdez/cdpsfy-nagios3
 
 COPY conf/ /etc/nagios3/conf.d/
 
-RUN service apache2 start; \
-	service nagios3 start;
-
-RUN sudo sed -i "s/check_http/check_http -p 5000/g" /etc/nagios3/conf.d/services_nagios2.cfg; \
-	sudo sed -i "s/check_ssh/check_ssh -p 5000/g" /etc/nagios3/conf.d/services_nagios2.cfg
+#RUN sudo sed -i "s/check_http/check_http!-p 3000/g" /etc/nagios3/conf.d/services_nagios2.cfg
 
 EXPOSE 80
 
 CMD service apache2 restart; \
+	service nagios3 restart; \
 	tail -f /var/log/nagios3/nagios.log
