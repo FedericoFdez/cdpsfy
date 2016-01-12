@@ -1,0 +1,57 @@
+# Docker compose file for multi-container cdpsfy app
+#
+# Federico A. Fernández Moreno
+# Rodrigo Barbado Esteban
+
+s1:
+  build: tracks
+  environment:
+    - PORT=3000
+
+s2:
+  build: tracks
+  environment:
+    - PORT=3000
+
+s3:
+  build: tracks
+  environment:
+    - PORT=3000
+
+s4:
+  build: tracks
+  environment:
+    - PORT=3000
+
+tracks.cdpsfy.es:
+  build: lb
+  ports:
+    - "8000:3000"
+    - "8001:8001"
+  links:
+    - s1
+    - s2
+    - s3
+    - s4
+
+www:
+  build: server
+  ports:
+    - "80:3000"
+  links:
+    - tracks.cdpsfy.es
+  environment:
+    - TRACKS_HOST=tracks.cdpsfy.es
+    - PORT=3000
+
+nagios:
+  build: nagios
+  ports:
+    - "8003:80"
+  links:
+    - s1
+    - s2
+    - s3
+    - s4
+    - tracks.cdpsfy.es
+    - www

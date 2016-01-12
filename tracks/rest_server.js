@@ -1,16 +1,21 @@
 var express = require('express');
 var path = require('path');
 var fs = require('fs');
+var logger = require('morgan');
 var multer = require('multer')
 
 var app = express();
 
 var nasPath = "/mnt/nas/"
 
+//var logStream = fs.createWriteStream(__dirname + '/tracks-cdpsfy.log', {flags: 'a'})
+//app.use(logger('dev', {stream: logStream}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
 
-app.listen(8000);
+var port = parseInt(process.env.PORT || '8000', 10);
+app.listen(port);
 
 var deleteFolderRecursive = function(path) {
     	if( fs.existsSync(path) ) {
@@ -33,7 +38,7 @@ app.get('/', function(req,res){
 //Devuelve la canción pedida
 app.get('/users/:userId/tracks/:trackId', function(req,res){
 	console.log("Getting track ", req.params.trackId)
-	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId + "/" + req.params.trackId;
+	p = __dirname + "/" + req.params.userId + "/" + req.params.trackId;
 	//p = nasPath + p;
 	file = p + ".mp3" //Habrá que seleccionar el nombre del archivo
 	console.log(file);
@@ -46,7 +51,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 	// ubicacion temporal del archivo
 	var tmp_path = req.file.path;
 	// ubicacion destino del archivo
-	var target_path = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId 
+	var target_path = __dirname + "/" + req.params.userId 
 		+ "/" + req.file.originalname;
 	console.log(target_path)
 	// mover el archivo a la ubicación destino
@@ -64,7 +69,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 //Elimina la canción especificada
 app.delete('/users/:userId/tracks/:trackId', function(req,res){
 	console.log("Delete");
-	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId + "/" + req.params.trackId + ".mp3"; 
+	p = __dirname + "/" + req.params.userId + "/" + req.params.trackId + ".mp3"; 
 	//p = nasPath + p;
 	console.log(p);
 	fs.unlinkSync(p);

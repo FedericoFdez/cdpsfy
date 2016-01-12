@@ -3,7 +3,7 @@ var track_model = require('../models/model');
 var http = require('http');
 var needle = require('needle')
 
-var tracksHost = "localhost"
+var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
 
 // Devuelve una lista de las canciones disponibles y sus metadatos
 exports.list = function (req, res) {
@@ -47,7 +47,9 @@ exports.create = function (req, res) {
 		uploaded_track: { buffer: track.buffer, filename: track.name, content_type: 'audio/mp3' }
 	}
 	
-	needle.post('localhost:8000/users/' + userId + '/tracks/' + id, 
+
+	needle.post('http://' + tracksHost + '/users/' + userId + '/tracks/' + id, 
+
 		{ uploaded_track: { 
 			buffer: track.buffer, 
 			filename: track.name, 
@@ -59,7 +61,9 @@ exports.create = function (req, res) {
 	);
 
 	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
-	var url = 'http://' + tracksHost + ':8000/users/' + userId + '/tracks/' + id;
+
+	var url = 'http://' + tracksHost + '/users/' + userId + '/tracks/' + id;
+
 	
 	// Escribe los metadatos de la nueva canción en el registro.
 
