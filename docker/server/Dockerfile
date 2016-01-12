@@ -8,9 +8,11 @@ FROM ubuntu:14.04
 
 RUN sudo apt-get update
 
-RUN sudo apt-get install -y curl;\
+RUN sudo apt-get install -y curl openssh-server;\
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -;\
     sudo apt-get install -y nodejs git
+
+RUN sudo service ssh restart
 
 # To be removed when git repo is public
 RUN mkdir -p /root/.ssh
@@ -27,4 +29,5 @@ EXPOSE 3000
 EXPOSE 7
 EXPOSE 22
 
-CMD npm start
+CMD service ssh start; \
+	npm start
