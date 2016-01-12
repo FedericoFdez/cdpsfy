@@ -8,7 +8,13 @@ var tracksHost = "localhost"
 // Devuelve una lista de las canciones disponibles y sus metadatos
 exports.list = function (req, res) {
 	track_model.Track.findAll().then(function(tracks){
-		res.render('tracks/index', {tracks: tracks})
+		for (var t in tracks){
+			track_model.User.find({where: {'id': tracks[t].UserId}}).then(function(user){
+				console.log(user.username);
+				tracks[t].userName = user.username;
+			})
+		}
+		res.render('tracks/index', {tracks: tracks});
 	})
 };
 
@@ -21,7 +27,10 @@ exports.new = function (req, res) {
 // El campo track.url contiene la url donde se encuentra el fichero de audio
 exports.show = function (req, res) {
 	track_model.Track.find({where: {'id': req.params.trackId}}).then(function(track){
-		res.render('tracks/show', {track: track});
+		track_model.User.find({where: {'id': track.UserId}}).then(function(user){
+			res.render('tracks/show', {track: track, user:user});
+		})
+		
 	})
 
 };
@@ -32,13 +41,13 @@ exports.create = function (req, res) {
 	console.log('Nuevo fichero de audio. Datos: ', track);
 	var id = track.name.split('.')[0];
 	var name = track.originalname.split('.')[0];
-
+	userId = req.session.user.id;
 	// Escritura del fichero de audio en tracks.cdpsfy.es
 	var data = {
 		uploaded_track: { buffer: track.buffer, filename: track.name, content_type: 'audio/mp3' }
 	}
 	
-	needle.post('localhost:8000/users/user0/tracks/' + id, 
+	needle.post('localhost:8000/users/' + userId + '/tracks/' + id, 
 		{ uploaded_track: { 
 			buffer: track.buffer, 
 			filename: track.name, 
@@ -50,11 +59,11 @@ exports.create = function (req, res) {
 	);
 
 	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
-	var url = 'http://' + tracksHost + ':8000/users/user0/tracks/' + id;
+	var url = 'http://' + tracksHost + ':8000/users/' + userId + '/tracks/' + id;
 	
 	// Escribe los metadatos de la nueva canción en el registro.
 
-	track_model.Track.build( {name: name, url: url
+	track_model.Track.build( {name: name, url: url, UserId: req.session.user.id
 						}).save().then(res.redirect('/tracks'));
 
 	
@@ -80,3 +89,4 @@ exports.destroy = function (req, res) {
 		track_model.Track.destroy({where: {'id': trackId}}).then(res.redirect('/tracks'));
 	});
 };
+

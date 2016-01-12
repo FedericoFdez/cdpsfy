@@ -1,0 +1,9 @@
+<%for (var t in followeds) {%>
+
+<a class="user" href='/users/<%=followeds[t].id%>'>
+	<img src="/images/user.png" height="50" width="50">
+	<p><%=followeds[t].username%></p>
+</a>
+
+
+<%}%>

@@ -74,7 +74,7 @@ app.delete('/users/:userId/tracks/:trackId', function(req,res){
 
 //Crea sistema de ficheros para el usuario registrado
 app.post('/users/:userId', function(req,res){
-	p = req.params.userId;
+	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId;
 	//p = pathNas + p
 	fs.mkdir(p, function(err){
 		if (err) {
@@ -86,7 +86,7 @@ app.post('/users/:userId', function(req,res){
 
 //Elimina sistema de ficheros del usuario que se ha dado de baja
 app.delete('/users/:userId', function(req,res){
-	p = req.params.userId;
+	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId;
 	// p = pathNas + p
 	deleteFolderRecursive(p);
 	res.send('Eliminado');

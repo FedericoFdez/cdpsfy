@@ -1,0 +1,10 @@
+<%for (var t in users) {%>
+<form method="post" action="/user/<%=users[t].id%>?_method=put">
+	<button type="submit">Follow</button>
+</form>
+<a class="user" href='/users/<%=users[t].id%>'>
+	<img src="/images/user.png" height="50" width="50">
+	<p><%=users[t].username%></p>
+</a>
+
+<%}%>

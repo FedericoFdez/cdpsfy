@@ -6,13 +6,29 @@
   </head>
   <body>
   	<div id="header">
+      <%if(!session.user) {%>
+        <span class="right">
+           <a href="/user">Sign up</a>
+        - <a href="/login">Login</a>
+
+        </span>
+      <%} else {%>
+        <span class="right"> <%=session.user.username%>
+        - <a href="/logout">Logout</a></span>
+        - <a href="/user/<%=session.user.id%>/delete">Borrar cuenta</a>
+      <%}%>      
     	<h1><a href="/">CDPSfy</a></h1>
   	</div>
     <div id="container">
 	    <div id="nav-bar">
 	    	<ul>
-	    		<li><a href="/tracks">My tracks</a></li>
+	    		<li><a href="/tracks">All tracks</a></li>
+          <%if(session.user){%>
+            <li><a href="/user/<%=session.user.id%>/timeline">Following</a></li>
+            <li><a href="/users/<%=session.user.id%>">My Tracks</a></li>
+          <%}%>
 	    		<li><a href="/tracks/new">Upload new track</a></li>
+          <li><a href="/users">Search users</a></li>
 	    	</ul>
 	    </div>
 	    <div id="container-body"><%- body %></div>
