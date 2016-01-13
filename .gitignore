@@ -39,3 +39,6 @@ p7/
 
 # Database
 server/cdpsfy.sqlite
+
+# Flocker keys
+docker/flocker

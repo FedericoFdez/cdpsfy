@@ -3,23 +3,36 @@
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
 
+nas:
+  image: ubuntu
+  volume_driver: flocker
+  volumes:
+    - nas:/mnt/nas
 s1:
   build: tracks
+  volumes_from:
+    - nas
   environment:
     - PORT=3000
 
 s2:
   build: tracks
+  volumes_from:
+    - nas
   environment:
     - PORT=3000
 
 s3:
   build: tracks
+  volumes_from:
+    - nas
   environment:
     - PORT=3000
 
 s4:
   build: tracks
+  volumes_from:
+    - nas
   environment:
     - PORT=3000
 
