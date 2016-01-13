@@ -33,7 +33,7 @@ def run(machine, command, background=False):
 def download_scenario():
     subprocess.call(["wget", "http://idefix.dit.upm.es/download/cdps/p7/p7.tgz"])
     subprocess.call(["tar", "xfvz", "p7.tgz"])
-    subprocess.call(["ln", "-s" "../p7full.xml", "p7/p7full.xml"])
+    subprocess.call(["ln", "-s", "../p7full.xml", "p7/p7full.xml"])
     subprocess.call(["rm", "p7.tgz"])
 
 def load_scenario():

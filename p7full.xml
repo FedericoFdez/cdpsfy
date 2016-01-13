@@ -76,7 +76,7 @@ SPAIN
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
     </if>
-    <route type="ipv4" gw="10.1.2.1">10.1.0.0/16</route>
+    <route type="ipv4" gw="10.1.4.1">10.1.0.0/16</route>
     <forwarding type="ip" />
   </vm>
 
@@ -94,7 +94,7 @@ SPAIN
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
     </if>
-    <route type="ipv4" gw="10.1.2.1">10.1.0.0/16</route>
+    <route type="ipv4" gw="10.1.4.1">10.1.0.0/16</route>
     <forwarding type="ip" />
   </vm>
 
