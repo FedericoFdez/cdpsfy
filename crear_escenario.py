@@ -14,7 +14,7 @@ NUM_NAS = 3
 NAS_IP = ["10.1.3.21", "10.1.3.22", "10.1.3.23"] # IP de NAS en LAN3
 NAGIOS_IP = {
     "lb": "10.1.10.2",
-    "frontend_server": "10.1.10.3", # .31, .32
+    "frontend_servers": "10.1.10.3", # .31, .32
     "backend_servers": "10.1.10.1", # .11, .12, etc.
     "nas": "10.1.10.2" # .21, .22, etc.
 }
@@ -62,7 +62,7 @@ def config_nagios_server():
         run("nagios", ["sudo", "apt-get", "install", "-y", "nagios3"])
 
     machines = list()
-    # Servidores REST backendvar/lxc/
+    # Servidores REST backend
     for k in range(NUM_BACKEND_SERVERS):
         ip_backend_server = NAGIOS_IP["backend_servers"] + str(k+1)
         name_backend_server = "s" + str(k+1)
@@ -74,8 +74,11 @@ def config_nagios_server():
         machines.append({"name": name_nas, "IP": ip_nas})
     # Balanceador
     machines.append({"name": "lb", "IP": NAGIOS_IP["lb"] })
-    # Servidor frontend
-    machines.append({"name": "www", "IP": NAGIOS_IP["frontend_server"] })
+    # Servidores frontend
+    for k in range(NUM_FRONTEND_SERVERS):
+        ip_frontend_server = NAGIOS_IP["frontend_servers"] + str(k+1)
+        name_frontend_server = "www" + str(k+1)
+        machines.append({"name": name_frontend_server, "IP": ip_frontend_server})
 
     machine_names = "localhost"
     for dic in machines:
@@ -105,7 +108,7 @@ def config_nagios_server():
         template = Template(f.read())
         values = {
             "DEBIAN_SERVERS": machine_names,
-            "WEB_SERVERS": "s1,s2,s3,s4,www1,ww2",
+            "WEB_SERVERS": "s1,s2,s3,s4,www1,www2",
             "SSH_SERVERS": machine_names
         }
         with open(output_name, 'w') as output_file:
@@ -116,14 +119,13 @@ def config_nagios_server():
     run("nagios", ["service", "nagios3", "restart"])
 
 def config_frontend_servers():
-    if not DEVELOPMENT:
-        run("www", ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
-        run("www", ["sudo", "apt-get", "install", "-y", "nodejs"])
-
     for k in map(str, range(1, NUM_FRONTEND_SERVERS+1)):
+        if not DEVELOPMENT:
+            run("www" + k, ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
+            run("www" + k, ["sudo", "apt-get", "install", "-y", "nodejs"])
         subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www" + k + "/rootfs/root"])
-        run("www", ["npm", "install", "/root/server/"])
-        run("www", ["node", "/root/server/bin/www"], background=True)
+        run("www" + k, ["npm", "install", "/root/server/"])
+        run("www" + k, ["node", "/root/server/bin/www"], background=True)
 
         subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /var/lib/lxc/www" + k + "/rootfs/etc/hosts\"",
                     shell=True)
