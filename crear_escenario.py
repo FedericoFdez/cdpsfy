@@ -7,18 +7,20 @@ from string import Template
 
 DEVELOPMENT = True
 
+NUM_FRONTEND_SERVERS = 2
 NUM_BACKEND_SERVERS = 4
 NUM_NAS = 3
 
-NAS_IP = ["10.1.4.21", "10.1.4.22", "10.1.4.23"] # IP de NAS en LAN3
+NAS_IP = ["10.1.3.21", "10.1.3.22", "10.1.3.23"] # IP de NAS en LAN3
 NAGIOS_IP = {
-    "lb": "10.1.10.3",
-    "frontend_server": "10.1.10.2",
+    "lb": "10.1.10.2",
+    "frontend_server": "10.1.10.3", # .31, .32
     "backend_servers": "10.1.10.1", # .11, .12, etc.
     "nas": "10.1.10.2" # .21, .22, etc.
 }
-TRACKS_LB_IP = "10.1.2.1"
-WWW_IP = "10.1.1.1"
+
+
+LB_IP = "10.1.1.1"
 
 
 def run(machine, command, background=False):
@@ -36,7 +38,9 @@ def download_scenario():
 
 def load_scenario():
     subprocess.call(["p7/bin/prepare-p7-vm"])
+    print("prepare")
     subprocess.call(["sudo", "vnx", "-f", "p7/p7full.xml", "-v", "--create"])
+    print("vnx")
 
 def config_glusterfs():
     # Configurar los servidores de disco (NAS)
@@ -101,7 +105,7 @@ def config_nagios_server():
         template = Template(f.read())
         values = {
             "DEBIAN_SERVERS": machine_names,
-            "WEB_SERVERS": "s1,s2,s3,s4,www",
+            "WEB_SERVERS": "s1,s2,s3,s4,www1,ww2",
             "SSH_SERVERS": machine_names
         }
         with open(output_name, 'w') as output_file:
@@ -111,21 +115,22 @@ def config_nagios_server():
     run("nagios", ["service", "apache2", "start"])
     run("nagios", ["service", "nagios3", "restart"])
 
-def config_frontend_server():
+def config_frontend_servers():
     if not DEVELOPMENT:
         run("www", ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
         run("www", ["sudo", "apt-get", "install", "-y", "nodejs"])
 
-    subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www/rootfs/root"])
-    run("www", ["npm", "install", "/root/server/"])
-    run("www", ["node", "/root/server/bin/www"], background=True)
+    for k in map(str, range(1, NUM_FRONTEND_SERVERS+1)):
+        subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www" + k + "/rootfs/root"])
+        run("www", ["npm", "install", "/root/server/"])
+        run("www", ["node", "/root/server/bin/www"], background=True)
 
-    subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+        subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /var/lib/lxc/www" + k + "/rootfs/etc/hosts\"",
                     shell=True)
-    subprocess.call("sudo bash -c \"echo " + \
-        TRACKS_LB_IP + "\ttracks.cdpsfy.es >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+        subprocess.call("sudo bash -c \"echo " + \
+            LB_IP + "\ttracks.cdpsfy.es >> /var/lib/lxc/www" + k + "/rootfs/etc/hosts\"",
                     shell=True)
-    subprocess.call("sudo bash -c \"echo \# END cdpsfy >> /var/lib/lxc/www/rootfs/etc/hosts\"",
+        subprocess.call("sudo bash -c \"echo \# END cdpsfy >> /var/lib/lxc/www" + k + "/rootfs/etc/hosts\"",
                     shell=True)
 
 def config_backend_servers():
@@ -142,7 +147,7 @@ def config_clients():
     for client in ["c1", "c2"]:
         path = "/var/lib/lxc/" + client + "/rootfs/etc/hosts"
         subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> " + path + "\"", shell=True)
-        subprocess.call("sudo bash -c \"echo " + WWW_IP + "\twww.cdpsfy.es >> " + path + "\"",
+        subprocess.call("sudo bash -c \"echo " + LB_IP + "\twww.cdpsfy.es >> " + path + "\"",
                         shell=True)
         subprocess.call("sudo bash -c \"echo \# END cdpsfy >> " + path + "\"", shell=True)
 
@@ -150,7 +155,7 @@ def config_clients():
     subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /etc/hosts\"",
                     shell=True)
     subprocess.call("sudo bash -c \"echo " + \
-        WWW_IP + "\twww.cdpsfy.es >> /etc/hosts\"",
+        LB_IP + "\twww.cdpsfy.es >> /etc/hosts\"",
                     shell=True)
     subprocess.call("sudo bash -c \"echo \# END cdpsfy >> /etc/hosts\"",
                     shell=True)
@@ -159,11 +164,12 @@ def main():
     #download_scenario()
     load_scenario()
     time.sleep(2)
-
+    print("load")
     config_glusterfs()
-
+    print("config_glusterfs")
     config_nagios_server()
-    config_frontend_server()
+    print("nagios server")
+    config_frontend_servers()
     config_backend_servers()
     config_clients()
 
