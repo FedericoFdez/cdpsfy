@@ -80,7 +80,7 @@ SPAIN
     <forwarding type="ip" />
   </vm>
 
-    <vm name="www2" type="lxc">
+  <vm name="www2" type="lxc">
     <filesystem type="cow">p7/filesystems/rootfs_lxc-cdps</filesystem>
     <if id="1" net="LAN4">
       <ipv4>10.1.4.32/24</ipv4>
