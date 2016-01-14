@@ -1,6 +1,8 @@
 var models = require('../models/model.js');
 var needle = require('needle')
 
+var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
+
 exports.autenticar = function(login,password,callback) {
 	models.User.find({
 		where: {
@@ -41,7 +43,7 @@ exports.create = function(req,res) {
 				.save()
 				.then( function() {
 					//Creo carpeta del usuario en el backend
-					needle.post('localhost:8000/users/' + user.id);
+					needle.post(tracksHost + '/users/' + user.id);
 					//crea la sesion con el usuario ya autenticado y redirige a /
 					req.session.user = {id: user.id, username: user.username};
 					res.redirect('/');

@@ -6,7 +6,7 @@ var multer = require('multer')
 
 var app = express();
 
-var nasPath = "/mnt/nas/"
+var savePath = process.env.NASPATH || __dirname
 
 //var logStream = fs.createWriteStream(__dirname + '/tracks-cdpsfy.log', {flags: 'a'})
 //app.use(logger('dev', {stream: logStream}));
@@ -38,8 +38,7 @@ app.get('/', function(req,res){
 //Devuelve la canción pedida
 app.get('/users/:userId/tracks/:trackId', function(req,res){
 	console.log("Getting track ", req.params.trackId)
-	p = __dirname + "/" + req.params.userId + "/" + req.params.trackId;
-	//p = nasPath + p;
+	p = savePath + "/" + req.params.userId + "/" + req.params.trackId;
 	file = p + ".mp3" //Habrá que seleccionar el nombre del archivo
 	console.log(file);
 	res.sendFile(file)
@@ -51,7 +50,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 	// ubicacion temporal del archivo
 	var tmp_path = req.file.path;
 	// ubicacion destino del archivo
-	var target_path = __dirname + "/" + req.params.userId 
+	var target_path = savePath + "/" + req.params.userId 
 		+ "/" + req.file.originalname;
 	console.log(target_path)
 	// mover el archivo a la ubicación destino
@@ -69,8 +68,7 @@ app.post('/users/:userId/tracks/:trackId', function(req,res){
 //Elimina la canción especificada
 app.delete('/users/:userId/tracks/:trackId', function(req,res){
 	console.log("Delete");
-	p = __dirname + "/" + req.params.userId + "/" + req.params.trackId + ".mp3"; 
-	//p = nasPath + p;
+	p = savePath + "/" + req.params.userId + "/" + req.params.trackId + ".mp3"; 
 	console.log(p);
 	fs.unlinkSync(p);
 	res.send('Cancion eliminada');
@@ -79,8 +77,7 @@ app.delete('/users/:userId/tracks/:trackId', function(req,res){
 
 //Crea sistema de ficheros para el usuario registrado
 app.post('/users/:userId', function(req,res){
-	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId;
-	//p = pathNas + p
+	p = savePath + "/" + req.params.userId;
 	fs.mkdir(p, function(err){
 		if (err) {
 			return console.error(err)
@@ -91,8 +88,7 @@ app.post('/users/:userId', function(req,res){
 
 //Elimina sistema de ficheros del usuario que se ha dado de baja
 app.delete('/users/:userId', function(req,res){
-	p = "/home/cdps/Documents/cdps/cdpsfy/tracks/" + req.params.userId;
-	// p = pathNas + p
+	p = savePath + "/" + req.params.userId;
 	deleteFolderRecursive(p);
 	res.send('Eliminado');
 });
