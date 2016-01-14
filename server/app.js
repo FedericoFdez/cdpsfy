@@ -9,8 +9,6 @@ var methodOverride = require('method-override');
 var fs = require('fs');
 var session = require('express-session');
 
-
-
 var routes = require('./routes/index');
 
 var app = express();

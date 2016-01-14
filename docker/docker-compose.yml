@@ -3,6 +3,7 @@
 # Federico A. Fernández Moreno
 # Rodrigo Barbado Esteban
 
+# tracks.cdpsfy.es servers and NAS pool
 nas:
   image: ubuntu
   volume_driver: flocker
@@ -36,6 +37,7 @@ s4:
   environment:
     - PORT=3000
 
+# load balancer
 tracks.cdpsfy.es:
   build: lb
   ports:
@@ -47,16 +49,26 @@ tracks.cdpsfy.es:
     - s3
     - s4
 
+# server.cdpsfy.es
+db:
+  image: postgres
+  environment:
+    - POSTGRES_PASSWORD=mipasswordsecreta
+
 www:
   build: server
   ports:
     - "80:3000"
   links:
     - tracks.cdpsfy.es
+    - db
   environment:
     - TRACKS_HOST=tracks.cdpsfy.es
     - PORT=3000
+    - DATABASE_URL=postgres://postgres:mipasswordsecreta@db:5432/postgres
+    - PASSWORD_ENCRYPTION_KEY=misecreto
 
+# nagios monitoring server
 nagios:
   build: nagios
   ports:
