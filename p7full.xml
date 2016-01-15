@@ -263,6 +263,7 @@ SPAIN
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
     </if>
+    <route type="ipv4" gw="10.1.10.2">10.1.0.0/16</route>
   </vm>
 
   <host>
