@@ -1,8 +1,8 @@
 var models = require('../models/model.js');
 var needle = require('needle')
 
-var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
-
+//var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
+var tracksHost = "localhost:8000"
 exports.autenticar = function(login,password,callback) {
 	models.User.find({
 		where: {
@@ -28,6 +28,7 @@ exports.new = function(req,res) {
 	res.render('user/new', {user: user, errors: []});
 };
 
+
 //POST /user
 exports.create = function(req,res) {
 	var user = models.User.build({username: req.body['user[username]'], password: req.body['user[password]']
@@ -52,6 +53,17 @@ exports.create = function(req,res) {
 		}
 	).catch(function(error){next(error)});
 };
+
+//GET /user/:userId/delete
+exports.destroy = function(req,res){
+	models.User.find({where: {id: req.session.user.id}}).then(function(user){
+		needle.delete(tracksHost + '/users/' + user.id);
+		user.destroy();
+		req.session.destroy();
+		res.redirect('/');
+	})
+}
+
 
 exports.list = function(req,res) {
 	models.User.findAll().then(function(users){

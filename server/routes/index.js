@@ -21,7 +21,7 @@ router.get('/logout', sessionController.destroy) //destruir sesion
 //Definicion de rutas de cuenta
 router.get('/user', userController.new); //Formulario login
 router.post('/user',userController.create); //Registrar usuario
-//router.delete('/user/:userId', userController.destroy) //Eliminar cuenta
+router.get('/user/:userId/delete', userController.destroy) //Eliminar cuenta
 
 
 
