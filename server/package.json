@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "DATABASE_URL=sqlite://:@:/ DATABASE_STORAGE=cdpsfy.sqlite PASSWORD_ENCRYPTION_KEY=asdasdasdasdasdad node ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
