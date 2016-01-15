@@ -56,12 +56,34 @@ exports.create = function(req,res) {
 
 //GET /user/:userId/delete
 exports.destroy = function(req,res){
+	userid = req.session.user.id;
+	models.Track.destroy({where: {UserId: userid}}).then(function(){
+		models.User.destroy({where: {id: req.session.user.id}}).then(function(){
+			needle.delete(tracksHost + '/users/' + userid);
+			req.session.destroy();
+			res.redirect('/');
+		})	
+	})
+	/*
 	models.User.find({where: {id: req.session.user.id}}).then(function(user){
 		needle.delete(tracksHost + '/users/' + user.id);
-		user.destroy();
-		req.session.destroy();
-		res.redirect('/');
+		user.destroy().then(
+			models.Track.find({where: {UserId: userid}}).then(function(tracks){
+				console.log("dentro");
+				console.log(userid)
+				console.log(tracks);
+				for (var t in tracks){
+					t.destroy();
+				}
+			})
+			
+		).then(function(){
+				req.session.destroy();
+				res.redirect('/');
+			})
+		
 	})
+*/
 }
 
 
