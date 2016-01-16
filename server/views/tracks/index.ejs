@@ -3,7 +3,11 @@
 <%for (var t in tracks) {%>
 
 <a class="track" href='/tracks/<%=tracks[t].id%>'>
-	<img src="/images/quaver3.png">
+	<% if(tracks[t].urlImage === ""){%>
+		<img src="/images/quaver3.png">
+	<%} else { %>
+		<img src="<%=tracks[t].urlImage%>">
+	<%}%>
 	<p><%=tracks[t].name%></p>
 	<p><%=tracks[t].userName%></p>
 </a>

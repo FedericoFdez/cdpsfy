@@ -36,7 +36,7 @@ exports.show = function (req, res) {
 };
 
 // Escribe una nueva canción en el registro de canciones.
-exports.create = function (req, res) {
+exports.create = function (req, res, next) {
 	var track = req.files.track;
 	console.log('Nuevo fichero de audio. Datos: ', track);
 	var id = track.name.split('.')[0];
@@ -68,13 +68,60 @@ exports.create = function (req, res) {
 	// Escribe los metadatos de la nueva canción en el registro.
 
 	track_model.Track.build( {name: name, url: url, UserId: req.session.user.id
-						}).save().then(res.redirect('/tracks'));
+						}).save().then(function(){
+							next();
+						});
 
 	
 
 	
 };
 
+exports.imageUpload = function(req,res){
+	console.log("imageupload");
+	var image = req.files.image;
+	console.log(image);
+	var id = image.name.split('.')[0];
+	var name = image.originalname.split('.')[0];
+	userId = req.session.user.id;
+	console.log("path")
+	console.log(req.files.image.path);
+	
+	var data = {
+		uploaded_track: { buffer: image.buffer, filename: image.name, content_type: 'image/png' }
+	}
+	
+
+	needle.post('http://' + tracksHost + '/users/' + userId + '/images/' + id, 
+
+		{ uploaded_track: { 
+			buffer: req.files.image.buffer, 
+			filename: req.files.image.name, 
+			content_type: 'image/png' } },
+		{ multipart: true },
+		function(err,result) {
+			console.log("result", result.body);
+		}
+	);
+
+	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
+
+	var url = 'http://' + tracksHost + '/users/' + userId + '/images/' + id;
+
+	
+	// Escribe los metadatos de la nueva canción en el registro.
+
+	track_model.Track.find({where: {UserId: req.session.user.id}}).then(function(track){
+		track.updateAttributes({
+			urlImage: url
+		})
+		}).then(function(){
+			res.redirect('/');
+	})
+
+	
+
+}
 // Borra una canción (trackId) del registro de canciones 
 exports.destroy = function (req, res) {
 	var trackId = req.params.trackId

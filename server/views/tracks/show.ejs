@@ -1,5 +1,9 @@
 <div class="track track_playing">
-	<img src="/images/quaver3.png">
+	<% if(track.urlImage === ""){%>
+		<img src="/images/quaver3.png">
+	<%} else { %>
+		<img src="<%=track.urlImage%>">
+	<%}%>
 	<p><%=track.name%></p>
 	<p>Uploaded by: <%=user.username%></p>
 	<audio src="<%=track.url%>" type="audio/mpeg" controls="controls"></audio>
