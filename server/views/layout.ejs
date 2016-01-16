@@ -15,7 +15,7 @@
       <%} else {%>
         <span class="right"> <%=session.user.username%>
         - <a href="/logout">Logout</a></span>
-        - <a href="/user/<%=session.user.id%>/delete">Borrar cuenta</a>
+        - <a href="/user/<%=session.user.id%>/delete" onclick="return confirm('Are you sure you want to delete your account?')">Delete account</a>
       <%}%>      
     	<h1><a href="/">CDPSfy</a></h1>
   	</div>
