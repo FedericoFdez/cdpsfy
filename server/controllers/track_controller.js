@@ -8,14 +8,15 @@ var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
 // Devuelve una lista de las canciones disponibles y sus metadatos
 exports.list = function (req, res) {
 	track_model.Track.findAll().then(function(tracks){
+		/*
 		for (var t in tracks){
 			track_model.User.find({where: {'id': tracks[t].UserId}}).then(function(user){
 				console.log(user.username);
 				tracks[t].userName = user.username;
 			})
-		}
+		*/
 		res.render('tracks/index', {tracks: tracks});
-	})
+		})
 };
 
 // Devuelve la vista del formulario para subir una nueva canción
@@ -42,6 +43,9 @@ exports.create = function (req, res, next) {
 	var id = track.name.split('.')[0];
 	var name = track.originalname.split('.')[0];
 	userId = req.session.user.id;
+	var image = req.files.image;
+	var imageid = image.name.split('.')[0];
+	var urlimage = 'http://' + tracksHost + '/users/' + userId + '/images/' + imageid;
 	// Escritura del fichero de audio en tracks.cdpsfy.es
 	var data = {
 		uploaded_track: { buffer: track.buffer, filename: track.name, content_type: 'audio/mp3' }
@@ -67,7 +71,7 @@ exports.create = function (req, res, next) {
 	
 	// Escribe los metadatos de la nueva canción en el registro.
 
-	track_model.Track.build( {name: name, url: url, UserId: req.session.user.id
+	track_model.Track.build( {name: name, url: url, urlImage: urlimage, UserId: req.session.user.id
 						}).save().then(function(){
 							next();
 						});
@@ -86,7 +90,10 @@ exports.imageUpload = function(req,res){
 	userId = req.session.user.id;
 	console.log("path")
 	console.log(req.files.image.path);
-	
+	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
+
+	var url = 'http://' + tracksHost + '/users/' + userId + '/images/' + id;
+
 	var data = {
 		uploaded_track: { buffer: image.buffer, filename: image.name, content_type: 'image/png' }
 	}
@@ -95,8 +102,8 @@ exports.imageUpload = function(req,res){
 	needle.post('http://' + tracksHost + '/users/' + userId + '/images/' + id, 
 
 		{ uploaded_track: { 
-			buffer: req.files.image.buffer, 
-			filename: req.files.image.name, 
+			buffer: image.buffer, 
+			filename: image.name, 
 			content_type: 'image/png' } },
 		{ multipart: true },
 		function(err,result) {
@@ -104,14 +111,11 @@ exports.imageUpload = function(req,res){
 		}
 	);
 
-	// Esta url debe ser la correspondiente al nuevo fichero en tracks.cdpsfy.es
-
-	var url = 'http://' + tracksHost + '/users/' + userId + '/images/' + id;
-
+	res.redirect('/');
 	
 	// Escribe los metadatos de la nueva canción en el registro.
-
-	track_model.Track.find({where: {UserId: req.session.user.id}}).then(function(track){
+	/*
+	track_model.Track.find({where: {url: }}).then(function(track){
 		track.updateAttributes({
 			urlImage: url
 		})
@@ -119,7 +123,7 @@ exports.imageUpload = function(req,res){
 			res.redirect('/');
 	})
 
-	
+	*/
 
 }
 // Borra una canción (trackId) del registro de canciones 
@@ -130,6 +134,12 @@ exports.destroy = function (req, res) {
 		// Borrado del fichero en tracks.cdpsfy.es
 		console.log(track.url);
 		needle.delete(track.url,
+			null,
+			function(err, result) {
+				console.log("result", result.body);
+			}
+		);
+		needle.delete(track.urlImage,
 			null,
 			function(err, result) {
 				console.log("result", result.body);
