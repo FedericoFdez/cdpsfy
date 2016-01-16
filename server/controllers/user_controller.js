@@ -1,8 +1,8 @@
 var models = require('../models/model.js');
 var needle = require('needle')
 
-//var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
-var tracksHost = "localhost:8000"
+var tracksHost = process.env.TRACKS_HOST || "localhost:8000"
+
 exports.autenticar = function(login,password,callback) {
 	models.User.find({
 		where: {

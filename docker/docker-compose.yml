@@ -17,7 +17,7 @@ s1:
   environment:
     - PORT=3000
     - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp
+    - TMPPATH=/mnt/nas/.tmp/
 
 s2:
   build: tracks
@@ -26,7 +26,7 @@ s2:
   environment:
     - PORT=3000
     - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp
+    - TMPPATH=/mnt/nas/.tmp/
 
 s3:
   build: tracks
@@ -35,7 +35,7 @@ s3:
   environment:
     - PORT=3000
     - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp
+    - TMPPATH=/mnt/nas/.tmp/
 
 s4:
   build: tracks
@@ -44,13 +44,12 @@ s4:
   environment:
     - PORT=3000
     - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp
+    - TMPPATH=/mnt/nas/.tmp/
 
 # load balancer
 tracks.cdpsfy.es:
   build: lb
   ports:
-    - "8000:80"
     - "8001:8001"
   links:
     - s1
@@ -61,12 +60,12 @@ tracks.cdpsfy.es:
 # server.cdpsfy.es
 db:
   image: postgres
-  volume_driver: flocker
-  volumes:
-    - dbdata:/var/lib/postgresql/data/cdpsfy
+#  volume_driver: flocker
+#  volumes:
+#    - dbdata:/var/lib/postgresql/data/cdpsfy
   environment:
     - POSTGRES_PASSWORD=mipasswordsecreta
-    - PGDATA=/var/lib/postgresql/data/cdpsfy
+#    - PGDATA=/var/lib/postgresql/data/cdpsfy
 
 www:
   build: server
