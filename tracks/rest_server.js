@@ -107,6 +107,16 @@ app.delete('/users/:userId/tracks/:trackId', function(req,res){
 
 });
 
+//Elimina la carátulaespecificada
+app.delete('/users/:userId/images/:imageId', function(req,res){
+	console.log("Delete");
+	p = savePath + "/" + req.params.userId + "/" + req.params.imageId + ".png"; 
+	console.log(p);
+	fs.unlinkSync(p);
+	res.send('Carátula eliminada');
+
+});
+
 //Crea sistema de ficheros para el usuario registrado
 app.post('/users/:userId', function(req,res){
 	p = savePath + "/" + req.params.userId;
