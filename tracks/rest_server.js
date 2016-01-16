@@ -7,12 +7,13 @@ var multer = require('multer')
 var app = express();
 
 var savePath = process.env.NASPATH || __dirname
+var tmpPath = process.env.TMPPATH || './.tmp/'
 
 //var logStream = fs.createWriteStream(__dirname + '/tracks-cdpsfy.log', {flags: 'a'})
 //app.use(logger('dev', {stream: logStream}));
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
+app.use(multer({ dest: tmpPath }).single('uploaded_track'));
 
 
 var port = parseInt(process.env.PORT || '8000', 10);

@@ -14,6 +14,7 @@ RUN sudo service ssh restart
 RUN sudo sed -i s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g '/etc/sysctl.conf'
 
 EXPOSE 8001
+EXPOSE 80
 EXPOSE 7
 EXPOSE 22
 
