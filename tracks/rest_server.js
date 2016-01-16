@@ -14,6 +14,7 @@ var savePath = process.env.NASPATH || __dirname
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({ dest: './.tmp/' }).single('uploaded_track'));
 
+
 var port = parseInt(process.env.PORT || '8000', 10);
 app.listen(port);
 
@@ -45,8 +46,39 @@ app.get('/users/:userId/tracks/:trackId', function(req,res){
 
 });
 
+//Devuelve la carátula pedida
+app.get('/users/:userId/images/:imageId', function(req,res){
+	console.log("Getting track ", req.params.imageId)
+	p = savePath + "/" + req.params.userId + "/" + req.params.imageId;
+	file = p + ".png" //Habrá que seleccionar el nombre del archivo
+	console.log(file);
+	res.sendFile(file)
+
+});
+
 //Inserta la canción subida
 app.post('/users/:userId/tracks/:trackId', function(req,res){
+	console.log(req.file);
+	// ubicacion temporal del archivo
+	var tmp_path = req.file.path;
+	// ubicacion destino del archivo
+	var target_path = savePath + "/" + req.params.userId 
+		+ "/" + req.file.originalname;
+	console.log(target_path)
+	// mover el archivo a la ubicación destino
+	fs.rename(tmp_path, target_path, function(err) {
+		if (err) throw err;
+		// borrar el archivo temporal
+		fs.unlink(tmp_path, function() {
+			if (err) throw err;
+		});
+	});
+
+    res.send("Cancion insertada");
+});
+
+//Inserta la imagen subida
+app.post('/users/:userId/images/:trackId', function(req,res){
 	// ubicacion temporal del archivo
 	var tmp_path = req.file.path;
 	// ubicacion destino del archivo
