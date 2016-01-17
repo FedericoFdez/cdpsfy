@@ -19,4 +19,4 @@ EXPOSE 7
 EXPOSE 22
 
 CMD	service ssh start; \
-	xr --verbose --server tcp:0:80 --backend s1:3000 --backend s2:3000 --backend s3:3000 --backend s4:3000 --web-interface 0:8001
+	xr --verbose --server http:0:80 -dr --host-match tracks.cdpsfy.es --backend s1:3000 --backend s2:3000 --backend s3:3000 --backend s4:3000 -df --host-match www.cdpsfy.es --backend www1:8080 --backend www2:8080 --web-interface 0:8001

@@ -6,12 +6,14 @@
 
 FROM federicofdez/cdpsfy-nagios3
 
-COPY conf/ /etc/nagios3/conf.d/
+COPY src /root/
 
 #RUN sudo sed -i "s/check_http/check_http!-p 3000/g" /etc/nagios3/conf.d/services_nagios2.cfg
 
 EXPOSE 80
 
-CMD service apache2 restart; \
+CMD cd /root && python nagios_autoconf.py; \
+	cp /root/conf/* /etc/nagios3/conf.d/; \
+	service apache2 restart; \
 	service nagios3 restart; \
 	tail -f /var/log/nagios3/nagios.log

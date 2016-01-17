@@ -9,86 +9,76 @@ nas:
   volume_driver: flocker
   volumes:
     - nas:/mnt/nas
+  command: tail -f /dev/null
 
-s1:
+tracks:
   build: tracks
   volumes_from:
     - nas
+  expose:
+    - "5000"
   environment:
-    - PORT=3000
+    - PORT=5000
     - NASPATH=/mnt/nas
     - TMPPATH=/mnt/nas/.tmp/
+    - TCP_PORTS=5000
 
-s2:
-  build: tracks
-  volumes_from:
-    - nas
-  environment:
-    - PORT=3000
-    - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp/
-
-s3:
-  build: tracks
-  volumes_from:
-    - nas
-  environment:
-    - PORT=3000
-    - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp/
-
-s4:
-  build: tracks
-  volumes_from:
-    - nas
-  environment:
-    - PORT=3000
-    - NASPATH=/mnt/nas
-    - TMPPATH=/mnt/nas/.tmp/
-
-# load balancer
-tracks.cdpsfy.es:
-  build: lb
-  ports:
-    - "8001:8001"
+lb1:
+  image: tutum/haproxy
+  container_name: tracks.cdpsfy.es
   links:
-    - s1
-    - s2
-    - s3
-    - s4
+    - tracks
+  ports:
+   - "5000:5000"
+  environment:
+   - BALANCE=roundrobin
+   - MODE=tcp
 
 # server.cdpsfy.es
 db:
   image: postgres
-#  volume_driver: flocker
-#  volumes:
-#    - dbdata:/var/lib/postgresql/data/cdpsfy
+  container_name: db
+  volume_driver: flocker
+  volumes:
+    - dbdata:/var/lib/postgresql/data/cdpsfy
   environment:
     - POSTGRES_PASSWORD=mipasswordsecreta
-#    - PGDATA=/var/lib/postgresql/data/cdpsfy
+    - PGDATA=/var/lib/postgresql/data/cdpsfy
+
+lb2:
+  image: tutum/haproxy
+  container_name: www.cdpsfy.es
+  links:
+    - www
+  ports:
+   - "80:5000"
+  environment:
+   - BALANCE=first
+   - MODE=tcp
 
 www:
   build: server
-  ports:
-    - "80:3000"
+  expose:
+    - "5000"
   links:
-    - tracks.cdpsfy.es
     - db
+    - lb1
   environment:
-    - TRACKS_HOST=tracks.cdpsfy.es
-    - PORT=3000
+    - TRACKS_HOST=tracks.cdpsfy.es:5000
+    - PORT=5000
     - DATABASE_URL=postgres://postgres:mipasswordsecreta@db:5432/postgres
     - PASSWORD_ENCRYPTION_KEY=misecreto
+    - TCP_PORTS=5000
 
 # nagios monitoring server
 nagios:
   build: nagios
+  links:
+    - nas
+    - tracks
+    - www
+    - lb1
+    - lb2
+    - db
   ports:
     - "8003:80"
-  links:
-    - s1
-    - s2
-    - s3
-    - s4
-    - tracks.cdpsfy.es
-    - www

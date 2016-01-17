@@ -25,7 +25,6 @@ RUN git clone git@github.com:FedericoFdez/cdpsfy.git
 WORKDIR cdpsfy/server
 RUN npm install
 
-EXPOSE 3000
 EXPOSE 7
 EXPOSE 22
 
