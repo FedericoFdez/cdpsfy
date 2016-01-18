@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "DATABASE_URL=sqlite://:@:/ DATABASE_STORAGE=cdpsfy.sqlite PASSWORD_ENCRYPTION_KEY=asdasdasdasdasdad node ./bin/www",
-    "deploy_vnx": "DATABASE_URL=postgres://postgres:@10.1.5.30:5432/postgres TRACKS_HOST=tracks.cdpsfy.es:8000 PASSWORD_ENCRYPTION_KEY=asdasdasdasdasdad node ./bin/www"
+    "deploy_vnx": "DATABASE_URL=postgres://postgres:@10.1.5.30:5432/postgres TRACKS_HOST=tracks.cdpsfy.es PASSWORD_ENCRYPTION_KEY=asdasdasdasdasdad node ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.13.2",

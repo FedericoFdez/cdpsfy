@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node rest_server.js",
-    "deploy_vnx": "NASPATH=/mnt/nas node ./bin/www"
+    "deploy_vnx": "NASPATH=/mnt/nas TMPPATH=/mnt/nas/.tmp node rest_server.js"
   },
   "dependencies": {
     "express": "~4.13.1",
