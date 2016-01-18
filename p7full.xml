@@ -98,6 +98,19 @@ SPAIN
     <forwarding type="ip" />
   </vm>
 
+  <vm name="db" type="lxc">
+    <filesystem type="cow">p7/filesystems/rootfs_lxc-cdps</filesystem>
+    <if id="1" net="LAN5">
+      <ipv4>10.1.5.30/24</ipv4>
+    </if>
+    <if id="2" net="LAN10">
+      <ipv4>10.1.10.30/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+  </vm>
+
   <vm name="lb" type="lxc">
     <filesystem type="cow">p7/filesystems/rootfs_lxc-cdps</filesystem>
     <if id="1" net="LAN1">

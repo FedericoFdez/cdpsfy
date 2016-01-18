@@ -20,7 +20,9 @@
     "needle": "^0.11.0",
     "pg": "^4.4.3",
     "sequelize": "^3.15.1",
-    "serve-favicon": "~2.3.0",
+    "serve-favicon": "~2.3.0"
+  },
+  "devDependencies": {
     "sqlite3": "^3.1.1"
   }
 }
