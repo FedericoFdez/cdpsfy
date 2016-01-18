@@ -136,10 +136,12 @@ def config_frontend_servers():
         if not DEVELOPMENT:
             run("www" + k, ["curl", "-sL", "https://deb.nodesource.com/setup_4.x", "|", "sudo", "-E", "bash", "-"])
             run("www" + k, ["sudo", "apt-get", "install", "-y", "nodejs"])
-        subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www" + k + "/rootfs/root"])
-        run("www" + k, ["npm", "install", "/root/server/"])
+        #subprocess.call(["sudo", "cp", "-r", "server", "/var/lib/lxc/www" + k + "/rootfs/root"])
+        #run("www" + k, ["npm", "install", "/root/server/"])
         #run("www" + k, ["source", "/root/server/.env"])
         #run("www" + k, ["node", "/root/server/bin/www"], background=True)
+        subprocess.call(["sudo","cp", "-r", "server","/var/lib/lxc/www"+ k +"/rootfs/server"])
+        subprocess.Popen(["sudo","npm", "deploy_vnx"], cwd="/var/lib/lxc/www"+ k +"/rootfs/server")
 
         subprocess.call("sudo bash -c \"echo \# BEGIN cdpsfy >> /var/lib/lxc/www" + k + "/rootfs/etc/hosts\"",
                     shell=True)
@@ -155,10 +157,11 @@ def config_backend_servers():
         run("www", ["sudo", "apt-get", "install", "-y", "nodejs"])
 
     for k in map(str, range(1, NUM_BACKEND_SERVERS+1)):
-        subprocess.call(["sudo", "cp", "-r", "tracks", "/var/lib/lxc/s" + k + "/rootfs/root"])
-        run("s" + k, ["npm", "install", "/root/tracks/"])
-        run("s" + k, ["node", "/root/tracks/rest_server.js"], background=True)
-
+        #subprocess.call(["sudo", "cp", "-r", "tracks", "/var/lib/lxc/s" + k + "/rootfs/root"])
+        #run("s" + k, ["npm", "install", "/root/tracks/"])
+        #run("s" + k, ["node", "/root/tracks/rest_server.js"], background=True)
+        subprocess.call(["sudo","cp", "-r", "tracks","/var/lib/lxc/www"+ k +"/rootfs/tracks"])
+        subprocess.Popen(["sudo","npm", "deploy_vnx"], cwd="/var/lib/lxc/www"+ k +"/rootfs/tracks")
 def config_lb():
     run("lb", ["apt-get", "install", "-y", "crossroads"])
     run("lb", ["xr", "--verbose", "--server", "http:0:80", "-dr", "--host-match", "tracks.cdpsfy.es", "--backend", BACKEND_IP + "1:8000", "--backend", BACKEND_IP + "2:8000", "--backend", BACKEND_IP + "3:8000", "--backend", BACKEND_IP + "4:8000", "-df", "--host-match", "www.cdpsfy.es", "--backend", FRONTEND_IP + "1:8080", "--backend", FRONTEND_IP + "2:8080", "--web-interface", "0:8001"])
