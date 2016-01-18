@@ -33,7 +33,7 @@ router.get('/tracks/new', sessionController.loginRequired, trackController.new);
 
 router.get('/tracks/:trackId', trackController.show);
 
-router.post('/tracks', multer({inMemory: true}), trackController.create, trackController.imageUpload);
+router.post('/tracks', multer({inMemory: true}), trackController.validate, trackController.create, trackController.imageUpload);
 
 router.delete('/tracks/:trackId', trackController.destroy);
 

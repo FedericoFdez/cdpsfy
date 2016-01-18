@@ -35,7 +35,14 @@ exports.show = function (req, res) {
 	})
 
 };
-
+// Comprueba si falta canción o carátula
+exports.validate = function (req,res,next) {
+	if (req.files.track === undefined || req.files.image === undefined) {
+		res.render('tracks/error');
+	} else {
+		next();
+	}
+}
 // Escribe una nueva canción en el registro de canciones.
 exports.create = function (req, res, next) {
 	var track = req.files.track;
