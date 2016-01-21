@@ -71,7 +71,7 @@ SPAIN
       <ipv4>10.1.5.31/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.11/24</ipv4>
+      <ipv4>10.1.10.31/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
@@ -89,7 +89,7 @@ SPAIN
       <ipv4>10.1.5.32/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.12/24</ipv4>
+      <ipv4>10.1.10.32/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
@@ -140,7 +140,7 @@ SPAIN
       <ipv4>10.1.3.11/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.13/24</ipv4>
+      <ipv4>10.1.10.11/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
@@ -160,7 +160,7 @@ SPAIN
       <ipv4>10.1.3.12/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.14/24</ipv4>
+      <ipv4>10.1.10.12/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
@@ -180,7 +180,7 @@ SPAIN
       <ipv4>10.1.3.13/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.15/24</ipv4>
+      <ipv4>10.1.10.13/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
@@ -200,7 +200,7 @@ SPAIN
       <ipv4>10.1.3.14/24</ipv4>
     </if>
     <if id="3" net="LAN10">
-      <ipv4>10.1.10.16/24</ipv4>
+      <ipv4>10.1.10.14/24</ipv4>
     </if>
     <if id="9" net="virbr0">
       <ipv4>dhcp</ipv4>
