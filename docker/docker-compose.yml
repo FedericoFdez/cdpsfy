@@ -12,7 +12,7 @@ nas:
   command: tail -f /dev/null
 
 tracks:
-  build: tracks
+  build: federicofdez/cdpsfy-tracks
   volumes_from:
     - nas
   expose:
@@ -57,7 +57,7 @@ lb2:
    - MODE=tcp
 
 www:
-  build: server
+  build: federicofdez/cdpsfy-server
   expose:
     - "5000"
   links:
