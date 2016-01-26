@@ -14,12 +14,6 @@ RUN sudo apt-get install -y curl openssh-server;\
 
 RUN sudo service ssh restart
 
-# To be removed when git repo is public
-RUN mkdir -p /root/.ssh
-COPY ssh/ /root/.ssh/
-RUN chmod 600 /root/.ssh/*
-RUN ssh-keyscan github.com > /root/.ssh/known_hosts
-
 RUN git clone git@github.com:FedericoFdez/cdpsfy.git
 
 WORKDIR cdpsfy/tracks
