@@ -14,7 +14,7 @@ RUN sudo apt-get install -y curl openssh-server;\
 
 RUN sudo service ssh restart
 
-RUN git clone git@github.com:FedericoFdez/cdpsfy.git
+RUN git clone https://github.com/FedericoFdez/cdpsfy.git
 
 WORKDIR cdpsfy/tracks
 RUN npm install
