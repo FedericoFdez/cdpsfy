@@ -4,9 +4,15 @@ Proyecto final de Centros de Datos y Provisión de SS - ETSIT UPM
 Desarrollado por [Rodrigo Barbado](https://github.com/rodbarest) y [Federico Fernández](https://github.com/FedericoFdez).
 
 ## Índice
--  [Descripción](#descripcion)
+-  [Descripción](#descripción)
+-  [Variables de entorno](#variables-de-entorno)
+        - [server.cdpsfy.es](#servercdpsfyes)
+        - [tracks.cdpsfy.es](#trackscdpsfyes)
+- [Instalación y despliegue](#instalación-y-despliegue)
+        - [Entorno de desarrollo](#entorno-de-desarollo)
+        - [Despliegue en escenario virtual (VNX)](#despliegue-en-escenario-virtual-vnx)
+        - [Despliegue en Docker](#despliegue-en-docker)
 
-<a name="descripcion" />
 ## Descripción
 El servicio se divide en dos partes:
 
