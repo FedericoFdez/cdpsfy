@@ -5,6 +5,7 @@ Desarrollado por [Rodrigo Barbado](https://github.com/rodbarest) y [Federico Fer
 
 ## Índice
 * [Descripción](#descripción)
+* [Arquitectura](#arquitectura)
 * [Variables de entorno](#variables-de-entorno)
   * [server.cdpsfy.es](#servercdpsfyes)
   * [tracks.cdpsfy.es](#trackscdpsfyes)
@@ -20,19 +21,22 @@ El servicio se divide en dos partes:
 * **tracks.cdpsfy.es**: es una red de servidores web y de disco, que almacena las canciones y las sirve vía HTTP. La implementación del servidor web RESTful se encuentra [aquí](https://github.com/FedericoFdez/cdpsfy/tree/master/tracks).
 
 ## Arquitectura
-La arquitectura básica puede verse en la siguiente figura:
+La solución que se ha implementado proporciona una **alta disponibilidad**, y es fácilmente **escalable**. La arquitectura básica puede verse en la siguiente figura:
 ![Arquitectura](/docs/Arquitectura.png)
 
-En Docker, ha sido necesario realizar algunas modificaciones, que pueden verse a continuación:
+En **Docker**, ha sido necesario realizar algunas modificaciones, que pueden verse a continuación:
+
 ![Docker](/docs/Docker.png)
 
-* lb1 y lb2: son dos balanceadores de carga, que utilizan la imagen de tutum/haproxy. Esta imagen facilita que el balanceo se produzca entre todas las instancias de www y de
-tracks que se arranquen en cada momento de forma automática. Ambos balanceadores escuchan en sendos puertos 5000, que se mapean con el 80 (lb1, www.cdpsfy.es) y 5000 (lb2, tracks.cdpsfy.es) en el host.
-* www: es el servicio en que se aloja la aplicación web (server.cdpsfy.es). Además del puerto 5000, expone sus puertos 7 y 22 para la monitorización desde Nagios.
-* tracks: es el servicio en que se aloja el servidor REST (tracks.cdpsfy.es). Además del puerto 5000, expone sus puertos 7 y 22 para la monitorización desde Nagios.
-* db: es el servicio en que se aloja la base de datos, y utiliza la imagen de Postgres para ello. Expone su puerto 5432 para la conexión a la base de datos desde fuera. Contiene un volumen de datos.
-* nas: es un servicio que se utiliza únicamente para alojar el volumen de datos en que se almacenan las canciones. Este volumen se monta en las instancias del servicio tracks (línea discontinua).
-* nagios: es un servicio que aloja el servidor Nagios.
+> Docker permite fácilmente que el servicio funcione en cualquier parte,
+> independientemente del entorno y sus características.
+
+* **lb1** y **lb2**: son dos balanceadores de carga, que utilizan la imagen de `tutum/haproxy`. Esta imagen facilita que el balanceo se produzca entre todas las instancias de *www* y de *tracks* que se arranquen en cada momento de forma automática. Ambos balanceadores escuchan en sendos puertos `5000`, que se mapean con el `80` (lb1, `www.cdpsfy.es`) y `5000` (lb2, `tracks.cdpsfy.es`) en el host.
+* **www**: es el servicio en que se aloja la aplicación web (`server.cdpsfy.es`). Además del puerto `5000`, expone sus puertos `7` y `22` para la monitorización desde Nagios.
+* **tracks**: es el servicio en que se aloja el servidor REST (`tracks.cdpsfy.es`). Además del puerto `5000`, expone sus puertos `7` y `22` para la monitorización desde Nagios.
+* **db**: es el servicio en que se aloja la base de datos, y utiliza la imagen de Postgres para ello. Expone su puerto `5432` para la conexión a la base de datos desde fuera. Contiene un volumen de datos.
+* **nas**: es un servicio que se utiliza únicamente para alojar el volumen de datos en que se almacenan las canciones. Este volumen se monta en las instancias del servicio tracks (línea discontinua).
+* **nagios**: es un servicio que aloja el servidor Nagios.
 
 ## Variables de entorno
 Se han definido las siguientes variables de entorno, a fin de que se pueda configurar *cdpsfy* en cualquier entorno:
